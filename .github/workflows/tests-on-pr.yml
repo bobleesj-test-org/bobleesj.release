@@ -41,6 +41,7 @@ jobs:
       - name: Validate
         run: |
           pytest --cov
+          coverage report -m
           codecov
 
       - name: Upload coverage to Codecov
