@@ -41,6 +41,8 @@ jobs:
       - name: Validate
         run: |
           pytest --cov
+          coverage report -m
+          codecov
 
       - name: Comment Codecov coverage reports 
         uses: codecov/codecov-action@v4.0.1
