@@ -48,8 +48,9 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           verbose: true
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
 
 
 # # jobs:
