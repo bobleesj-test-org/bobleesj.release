@@ -24,4 +24,6 @@ from importlib.metadata import version
 __version__ = version("bobleesj.release")
 print("Hello world")
 
+def print_hello():
+    print("Hello world")
 # End of file
