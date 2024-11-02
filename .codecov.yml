@@ -3,7 +3,7 @@ coverage:
     project: # add everything under here, more options at https://docs.codecov.com/docs/commit-status
       default:
         target: auto # use the coverage from the base commit, fail if coverage is lower
-        threshold: 0%  # allow the coverage to drop by 
+        threshold: 0%  # allow the coverage to drop by
 
 comment:                  
   layout: " diff, flags, files"
