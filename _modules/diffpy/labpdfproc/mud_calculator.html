@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>diffpy.labpdfproc.mud_calculator &mdash; diffpy.labpdfproc 0.6.3 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+  <title>diffpy.labpdfproc.mud_calculator &mdash; diffpy.labpdfproc 0.7.0rc0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=fd19c00e"></script>
+      <script src="../../../_static/documentation_options.js?v=f0b64c81"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -70,21 +70,21 @@
            <div itemprop="articleBody">
              
   <h1>Source code for diffpy.labpdfproc.mud_calculator</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">dual_annealing</span>
-<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">convolve</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">dual_annealing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">convolve</span>
 
-<span class="kn">from</span> <span class="nn">diffpy.utils.parsers.loaddata</span> <span class="kn">import</span> <span class="n">loadData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">diffpy.utils.parsers.loaddata</span><span class="w"> </span><span class="kn">import</span> <span class="n">loadData</span>
 
 
-<span class="k">def</span> <span class="nf">_top_hat</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">slit_width</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_top_hat</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">slit_width</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    create a top-hat function, return 1.0 for values within the specified slit width and 0 otherwise</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="n">slit_width</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="n">slit_width</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_model_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">diameter</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">I0</span><span class="p">,</span> <span class="n">mud</span><span class="p">,</span> <span class="n">slope</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_model_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">diameter</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">I0</span><span class="p">,</span> <span class="n">mud</span><span class="p">,</span> <span class="n">slope</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    compute the model function with the following steps:</span>
 <span class="sd">    1. Recenter x to h by subtracting x0 (so that the circle is centered at 0 and it is easier to compute length l)</span>
@@ -104,7 +104,7 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">I0</span> <span class="o">-</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">mud</span> <span class="o">/</span> <span class="n">diameter</span> <span class="o">*</span> <span class="n">length</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_extend_x_and_convolve</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">diameter</span><span class="p">,</span> <span class="n">slit_width</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">I0</span><span class="p">,</span> <span class="n">mud</span><span class="p">,</span> <span class="n">slope</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_extend_x_and_convolve</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">diameter</span><span class="p">,</span> <span class="n">slit_width</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">I0</span><span class="p">,</span> <span class="n">mud</span><span class="p">,</span> <span class="n">slope</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    extend x values and I values for padding (so that we don&#39;t have tails in convolution), then perform convolution</span>
 <span class="sd">    (note that the convolved I values are the same as modeled I values if slit width is close to 0)</span>
@@ -123,7 +123,7 @@
     <span class="k">return</span> <span class="n">I_convolved</span><span class="p">[</span><span class="n">padding_length</span><span class="p">:</span><span class="o">-</span><span class="n">padding_length</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_objective_function</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">observed_data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_objective_function</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">observed_data</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    compute the objective function for fitting a model to the observed/experimental data</span>
 <span class="sd">    by minimizing the sum of squared residuals between the observed data and the convolved model data</span>
@@ -134,7 +134,7 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">residuals</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_compute_single_mud</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">I_data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_single_mud</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">I_data</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    perform dual annealing optimization and extract the parameters</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -156,7 +156,7 @@
 
 <div class="viewcode-block" id="compute_mud">
 <a class="viewcode-back" href="../../../api/diffpy.labpdfproc.html#diffpy.labpdfproc.mud_calculator.compute_mud">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_mud</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_mud</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    compute the best-fit mu*D value from a z-scan file</span>
 
